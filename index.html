@@ -3,55 +3,264 @@
 <head>
 	<title>Tarea</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="agecheck.css">
 </head>
-<body>
-	<div class="container-fluid">
-		<div class="row">
-			<div class="card w-100 col-auto">
-				<div class="text-center">
-				   <p class="col-12 m-1 p-1 font-weight-bold">Write here the topic for your lovely quote</p>
-				  <input id="input--topic" class="w-50 col-auto align-self-center" placeholder="Love, everybody write love in this kind of pages, allways">
-				  <button id="btn--buscar" class="btn btn-danger col-auto" type="button">Buscar</button>
-				</div>
-				<div class="w-50 card-block align-self-center bg-danger text-dark">
-					<span id="show--result" class="card-blockquote"></span>
+	<body class="bg-dark">
+		<script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+		<script>
+			$(document).ready(function(){
+   				$.ageCheck();
+   			});
+		</script>
+		<div id="topword" class="container-fluid p-4 mt-5 bg-danger" >
+			<div class="card bg-dark border-0">
+				<div class="header text-center w-100 p-1" id="topword">
+				<h1 class="display-2 font-weight-normal text-light">Sad? unmotivated?</h1>
+				<h2 class="display-4 text-light">Let's find some quotes who could inspire you!</h2>			
+				</div>		
+			</div>		
+		</div>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="card w-100 col-auto bg-dark">
+					<div class="text-center">
+					   <p class="col-12 m-1 p-1 text-light font-weight-bold">Write here the topic for your lovely quote</p>
+					  <input id="input--topic" class="w-50 col-auto align-self-center" placeholder="Love, everybody write love in this kind of pages, allways">
+					  <button id="btn--buscar" class="btn btn-danger col-auto" type="button">Buscar</button>
+					</div>
+					<div class="w-50 card-block align-self-center bg-danger text-dark">
+						<span id="show--result" class="card-blockquote font-weight-bold"></span>
+					</div>					
 				</div>					
-			</div>					
-		</div>		
-	</div>
-
-
-<script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
+			</div>		
+		</div>
 	<script>
-	$("#btn--buscar").click(function(){	
-		var topic = $("#input--topic").val();
-		console.log(topic);	
-		$.ajax({
-			method: "GET",
-			url: "https://150000-quotes.p.rapidapi.com/keyword/"+topic,
-			async: true,
-			crossDomain: true,
-			headers : {
-				"x-rapidapi-host": "150000-quotes.p.rapidapi.com",
-				"x-rapidapi-key": "82006b13d6msh809dc7f565df253p1f4cfcjsn27c3dc69b08d"
-			},
-			beforeSend: function (){
-				$("#show--result").text("I'm searching the perfect quote for you. Just keep calm and wait for it");
-			},
+		$("#btn--buscar").click(function(){	
+			var topic = $("#input--topic").val();
+			console.log(topic);	
+			$.ajax({
+				method: "GET",
+				url: "https://150000-quotes.p.rapidapi.com/keyword/"+topic,
+				async: true,
+				crossDomain: true,
+				headers : {
+					"x-rapidapi-host": "150000-quotes.p.rapidapi.com",
+					"x-rapidapi-key": "82006b13d6msh809dc7f565df253p1f4cfcjsn27c3dc69b08d"
+				},
+				beforeSend: function (){
+					$("#show--result").text("I'm searching the perfect quote for you. Just keep calm and wait for it");
+				},
+					success: function(response) {
+					$("#show--result").html("Look at this one: "+response.message+"<br> It was said for: "+response.author+"<br>It's a "+response.nationality+", "+response.profession+"<br> Want more? Just make another search!");
+				},
+					error: function() {
+					$("#show--result").text("I don't want to make you sad/angry but couldn't find any quote :( . Try again with another topic!");
+				}
 
-			success: function(response) {
-				$("#show--result").html("Look at this one: "+response.message+"<br> It was said for: "+response.author+"<br>It's a "+response.nationality+", "+response.profession);
-			},
+				});
+			});
+		</script>
 
-			error: function() {
-				$("#show--result").text("I don't want to make you sad/angry but couldn't find any quote :( . Try again with another topic!");
-			}
-		});
-	});
-	</script>
+		<script>
+			(function ($) {
+			  $.ageCheck = function (options) {
+			    const settings = $.extend({
+			      minAge: 18,
+			      redirectTo: '',
+			      redirectOnFail: '',
+			      title: 'Age Verification',
+			      copy: 'This Website have quotes that could let you really inspired. So we need to know if you are 18 years or older',
+			      success: null,
+			      successMsg: {
+			        header: 'Success!',
+			        body: 'You are now being redirected back to the application...'
+			      },
+			      underAgeMsg: 'Sorry, you are not old enough to view this amazing quotes...',
+			      underAge: null,
+			      errorMsg: {
+			        invalidDay: 'Day is invalid or empty',
+			        invalidYear: 'Year is invalid or empty'
+			      },
+			      storage: 'sessionStorage',
+			      storageExpires: null,
+			    }, options);
 
-</body>
+			    var storage = window[settings.storage];
+
+			    const _this = {
+			      month: '',
+			      day: '',
+			      year: '',
+			      age: '',
+			      errors: [],
+			      setValues() {
+			        const month = $('.ac-container .month').val();
+			        const day = $('.ac-container .day').val();
+			        _this.month = month;
+			        _this.day = day.replace(/^0+/, ''); // remove leading zero
+			        _this.year = $('.ac-container .year').val();
+			      },
+			      validate() {
+			        _this.errors = [];
+			        if (/^([0-9]|[12]\d|3[0-1])$/.test(_this.day) === false) {
+			          _this.errors.push(settings.errorMsg.invalidDay);
+			        }
+			        if (/^(19|20)\d{2}$/.test(_this.year) === false) {
+			          _this.errors.push(settings.errorMsg.invalidYear);
+			        }
+			        _this.clearErrors();
+			        _this.displayErrors();
+			        return _this.errors.length < 1;
+			      },
+			      clearErrors() {
+			        $('.errors').html('');
+			      },
+			      displayErrors() {
+			        let html = '<ul>';
+			        for (let i = 0; i < _this.errors.length; i++) {
+			          html += `<li><span>x</span>${_this.errors[i]}</li>`;
+			        }
+			        html += '</ul>';
+			        setTimeout(() => {
+			          $('.ac-container .errors').html(html);
+			        }, 200);
+			      },
+			      reCenter(b) {
+			        b.css('top', `${Math.max(0, (($(window).height() - (b.outerHeight() + 150)) / 2))}px`);
+			        b.css('left', `${Math.max(0, (($(window).width() - b.outerWidth()) / 2))}px`);
+			      },
+			      buildHtml() {
+			        const copy = settings.copy;
+			        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+			        let html = '';
+			        html += '<div class="ac-overlay"></div>';
+			        html += '<div class="ac-container">';
+			        html += `<h2>${settings.title}</h2>`;
+			        html += `<p>${copy.replace('[21]', `<strong>${settings.minAge}</strong>`)}` + '</p>';
+			        html += '<div class="errors"></div>';
+			        html += '<div class="fields"><select class="month">';
+			        for (let i = 0; i < months.length; i++) {
+			          html += `<option value="${i}">${months[i]}</option>`;
+			        }
+			        html += '</select>';
+			        html += '<input class="day" maxlength="2" placeholder="01" />';
+			        html += '<input class="year" maxlength="4" placeholder="1989"/>';
+			        html += '<button>Submit</button></div></div>';
+
+			        $('body').append(html);
+
+			        $('.ac-overlay').animate({
+			          opacity: 0.8,
+			        }, 500, () => {
+			          _this.reCenter($('.ac-container'));
+			          $('.ac-container').css({
+			            opacity: 1,
+			          });
+			        });
+
+			        $('.ac-container .day, .ac-container .year').focus(function () {
+			          $(this).removeAttr('placeholder');
+			        });
+			      },
+			      setAge() {
+			        _this.age = '';
+			        const birthday = new Date(_this.year, _this.month, _this.day);
+			        const ageDifMs = Date.now() - birthday.getTime();
+			        const ageDate = new Date(ageDifMs); // miliseconds from epoch
+			        _this.age = Math.abs(ageDate.getUTCFullYear() - 1970);
+			      },
+			      getStorage() {
+			        if(settings.storage === 'cookie') {
+			          return document.cookie.split(';').filter((item) => item.trim().startsWith('ageVerified=')).length;
+			        } else {
+			          return storage.getItem('ageVerified') === 'true';
+			        }
+			      },
+			      setStorage(key, val, expires) {
+			        try {
+			          if(settings.storage === 'cookie') {
+			            if(expires) {
+			              let date = new Date();
+			              date.setTime(date.getTime() + (expires * 24 * 60 * 60 * 1000));
+			              expires = date.toGMTString();
+			            }
+			            document.cookie = "ageVerified=true; expires=" + expires + ";";
+			          } else {
+			            storage.setItem(key, val);
+			          }
+			          return true;
+			        } catch (e) {
+			          return false;
+			        }
+			      },
+			      handleSuccess() {
+			        const successMsg = `<h3>${settings.successMsg.header}</h3><p>${settings.successMsg.body}</p>`;
+			        $('.ac-container').html(successMsg);
+			        setTimeout(() => {
+			          $('.ac-container').animate({
+			            top: '-350px',
+			          }, 200, () => {
+			            $('.ac-overlay').animate({
+			              opacity: '0',
+			            }, 500, () => {
+			              if (settings.redirectTo !== '') {
+			                window.location.replace(settings.redirectTo);
+			              } else {
+			                $('.ac-overlay, .ac-container').remove();
+			                if (settings.success) {
+			                  settings.success();
+			                }
+			              }
+			            });
+			          });
+			        }, 2000);
+			      },
+			      handleUnderAge() {
+			        const underAgeMsg = `<h3>${settings.underAgeMsg}</h3>`;
+			        $('.ac-container').html(underAgeMsg);
+			        if (settings.redirectOnFail !== '') {
+			          setTimeout(() => {
+			            window.location.replace(settings.redirectOnFail);
+			          }, 2000);
+			        }
+			        if (settings.underAge) {
+			          settings.underAge();
+			        }
+			      },
+			    }; // end _this
+
+			    if (_this.getStorage()) {
+			      return false;
+			    }
+
+			    _this.buildHtml();
+
+			    $('.ac-container button').on('click', () => {
+			      _this.setValues();
+			      if (_this.validate() === true) {
+			        _this.setAge();
+
+			        if (_this.age >= settings.minAge) {
+			          if (!_this.setStorage('ageVerified', 'true', settings.storageExpires)) {
+			            console.log(settings.storage + ' not supported by your browser');
+			          }
+			          _this.handleSuccess();
+			        } else {
+			          _this.handleUnderAge();
+			        }
+			      }
+			    });
+
+			    $(window).resize(() => {
+			      _this.reCenter($('.ac-container'));
+			      setTimeout(() => {
+			        _this.reCenter($('.ac-container'));
+			      }, 500);
+			    });
+			  };
+			}(jQuery));
+		</script>
+	</body>
 </html>
 
 
